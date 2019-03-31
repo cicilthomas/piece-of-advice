@@ -5,7 +5,7 @@
 
 ## About
 
-This Alexa skill can give you random advices or advices on specific topics that you ask. The advices are fetched from [api.adviceslip.com]([https://api.adviceslip.com/](https://api.adviceslip.com/)). 
+This Alexa skill can give you random advices or advices on specific topics that you ask. The advices are fetched from [api.adviceslip.com](https://api.adviceslip.com/). 
 
 ### Sample utterances
 
