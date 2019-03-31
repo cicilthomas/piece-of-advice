@@ -3,6 +3,7 @@
 const Alexa = require('ask-sdk-core')
 const https = require('https');
 
+
 const LaunchRequestHandler = {
   canHandle(handlerInput) {
     return handlerInput.requestEnvelope.request.type === 'LaunchRequest';
@@ -23,12 +24,33 @@ const AdviceIntentHandler = {
     return handlerInput.requestEnvelope.request.type === 'IntentRequest'
       && handlerInput.requestEnvelope.request.intent.name === 'AdviceIntent';
   },
-  handle(handlerInput) {
-    const speechText = 'Once you find a really good friend don\'t do anything that could mess up your friendship.';
+  async handle(handlerInput) {
+    const request = handlerInput.requestEnvelope.request;
+    var searchQuery, advice;
 
+    /* Check for a specific advice topic */
+    if(isSlotFilled(request)) {
+      searchQuery = request.intent.slots.adviceType.value;
+    }
+
+    const options = buildAdviceOptions(searchQuery);
+    const response = await httpGet(options);
+
+    if(response && response.total_results && parseInt(response.total_results) > 0
+      && response.slips && response.slips[0] && response.slips[0].advice) {
+        advice = response.slips[0].advice;
+    } 
+    else if(response && response.slip && response.slip.advice) {
+      advice = response.slip.advice;
+    } 
+    else {
+      advice = 'Once you find a really good friend don\'t do anything that could mess up your friendship.';
+    }
+    console.log(advice);
     return handlerInput.responseBuilder
-      .speak(speechText)
-      .withSimpleCard('Advice of the day', speechText)
+      .speak(advice)
+      .reprompt(advice)
+      .withSimpleCard('Advice of the day', advice)
       .getResponse();
   },
 };
@@ -96,6 +118,7 @@ const ErrorHandler = {
   },
   handle(handlerInput, error) {
     console.log(`Error handled: ${error.message}`);
+    console.log(`Error : ${JSON.stringify(error)}`);
 
     return handlerInput.responseBuilder
       .speak('Sorry, I can\'t understand the command. Please say again.')
@@ -103,6 +126,27 @@ const ErrorHandler = {
       .getResponse();
   },
 };
+
+function buildAdviceHttpPath(searchQuery) {
+
+  return `/advice${searchQuery?'/search/' + searchQuery:''}`;
+}
+
+function buildAdviceOptions(searchQuery) {
+
+  return {
+    host: 'api.adviceslip.com',
+    port: 443,
+    path: buildAdviceHttpPath(searchQuery),
+    method: 'GET',
+    timeout: 7000,
+  }
+}
+
+function isSlotFilled(request) {
+  return request && request.intent && request.intent.slots 
+    && request.intent.slots.adviceType && request.intent.slots.adviceType.value
+}
 
 function httpGet(options) {
   return new Promise(((resolve, reject) => {
