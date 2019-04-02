@@ -90,6 +90,8 @@ Open piece of advice
 
 *  [Hackster.io](https://www.hackster.io/amazon-alexa) - See what others are building with Alexa.
 
+* [Stackoverflow](https://stackoverflow.com/questions/tagged/alexa) - Checkout the questions and answers on Alexa.
+
 ### Tutorials & Guides
 
 *  [Voice Design Guide](https://developer.amazon.com/designing-for-voice/) - A great resource for learning conversational and voice user interface design.
